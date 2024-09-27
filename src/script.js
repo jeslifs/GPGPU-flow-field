@@ -82,12 +82,16 @@ renderer.setPixelRatio(sizes.pixelRatio)
 debugObject.clearColor = '#29191f'
 renderer.setClearColor(debugObject.clearColor)
 
+/**
+ * Load Model
+ */
+const gltf = await gltfLoader.loadAsync('./model.glb')
 
 /**
  * Base geometry
  */
 const baseGeometry = {}
-baseGeometry.instance = new THREE.SphereGeometry(3)
+baseGeometry.instance = gltf.scene.children[0].geometry
 baseGeometry.count = baseGeometry.instance.attributes.position.count
 
 /**
@@ -157,6 +161,7 @@ for(let y = 0; y < gpgpu.size; y++)
 particles.geometry = new THREE.BufferGeometry()
 particles.geometry.setDrawRange(0, baseGeometry.count)
 particles.geometry.setAttribute('aParticlesUv', new THREE.BufferAttribute(particlesUvArray, 2))
+particles.geometry.setAttribute('aColor', baseGeometry.instance.attributes.color)
 
 
 // Material
@@ -165,7 +170,7 @@ particles.material = new THREE.ShaderMaterial({
     fragmentShader: particlesFragmentShader,
     uniforms:
     {
-        uSize: new THREE.Uniform(0.4),
+        uSize: new THREE.Uniform(0.07),
         uResolution: new THREE.Uniform(new THREE.Vector2(sizes.width * sizes.pixelRatio, sizes.height * sizes.pixelRatio)),
         uParticlesTexture: new THREE.Uniform()
     }
